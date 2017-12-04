@@ -1,0 +1,54 @@
+{
+  "name": "systemjs-plugin-domture",
+  "description": "systemjs plugin for domture",
+  "version": "0.0.0",
+  "main": "dist-es5/index.js",
+  "typings": "dist-es5/index.d.ts",
+  "files": [
+    "dist-es5"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run build-es5",
+    "build-es5": "tsc -p tsconfig.es5.json",
+    "clean": "rimraf dist dist-es5",
+    "dependency-check": "dependency-check . --unused --no-dev && dependency-check . --missing --no-dev",
+    "lint": "tslint -p tsconfig.json 'src/**/*.ts'",
+    "prepublishOnly": "npm run build",
+    "test": "echo no test in this plugin. Test is done in 'domture'"
+  },
+  "author": {
+    "name": "Homa Wong",
+    "email": "homawong@gmail.com"
+  },
+  "homepage": "https://github.com/unional/systemjs-plugin-domture",
+  "bugs": {
+    "url": "https://github.com/unional/systemjs-plugin-domture/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unional/systemjs-plugin-domture.git"
+  },
+  "license": "MIT",
+  "release": {
+    "analyzeCommits": {
+      "releaseRules": [
+        {
+          "breaking": true,
+          "release": "minor"
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "dependency-check": "^2.9.1",
+    "eslint-config-unional": "^0.2.3",
+    "rimraf": "^2.6.2",
+    "tslint": "^5.8.0",
+    "tslint-config-unional": "^0.8.0",
+    "typescript": "^2.6.2"
+  },
+  "dependencies": {
+    "@unional/logging": "^0.2.3",
+    "is-windows": "^1.0.1"
+  }
+}
