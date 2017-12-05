@@ -12,43 +12,40 @@ const extMap = {
 }
 export function locate(load) {
   const isWindows = this._nodeRequire('is-windows')
-  const filePath = getFilePath(isWindows, load.address)
+  if (isWindows())
+    locateForWindows(this, load)
+  else
+    locateForOtherOS(this, load)
 
-  const fs = this._nodeRequire('fs')
-  if (fs.existsSync(filePath)) {
-    if (fs.statSync(filePath).isDirectory()) {
-      const extensions = getExtensions(this.domtureConfig)
-      const ext = extensions.find(ext => {
-        const path = `${filePath}/index${ext}`
-        return fs.existsSync(path)
-      })
-      if (ext) {
-        const logger = this._nodeRequire('@unional/logging').getLogger('domture')
-        const address = load.address
-        load.address += `/index${ext}`
-        logger.debug(`locate ${address} as ${load.address}`)
-      }
-    }
-  }
-  else {
-    const extensions = getExtensions(this.domtureConfig)
-    const ext = extensions.find(ext => {
-      return fs.existsSync(filePath + ext)
-    })
-    if (ext) {
-      const logger = this._nodeRequire('@unional/logging').getLogger('domture')
-      const address = load.address
-      load.address += ext
-      logger.debug(`locate ${address} as ${load.address}`)
-    }
-  }
 }
-
-function getFilePath(isWindows, address: string) {
+function locateForWindows(systemjs, load) {
+  // slice(8): trim 'file:///' + 'C:/Users/...'
+  const suffix = findMissingFileSuffix(systemjs, load.address.slice(8))
+  updateAddressIfNeeded(systemjs, load, suffix)
+}
+function locateForOtherOS(systemjs, load) {
   // slice(7): trim 'file://' + '/Users/x/y/z'
-  // slice(8): trime 'file:///' + 'C:/Users/...'
-  // istanbul ignore next
-  return isWindows() ? address.slice(8) : address.slice(7)
+  const suffix = findMissingFileSuffix(systemjs, load.address.slice(7))
+  updateAddressIfNeeded(systemjs, load, suffix)
+}
+function findMissingFileSuffix(systemjs, givenFilePath) {
+  const fs = systemjs._nodeRequire('fs')
+  if (fs.existsSync(givenFilePath)) {
+    if (fs.statSync(givenFilePath).isDirectory()) {
+      const ext = findExtension(fs, getExtensions(systemjs.domtureConfig), givenFilePath + '/index')
+      return ext ? '/index' + ext : undefined
+    }
+    else
+      return undefined
+  }
+  else
+    return findExtension(fs, getExtensions(systemjs.domtureConfig), givenFilePath)
+}
+function findExtension(fs, extensions, filePath) {
+  return extensions.find(ext => {
+    const path = filePath + ext
+    return fs.existsSync(path)
+  })
 }
 
 function getExtensions(domtureConfig): string[] {
@@ -56,4 +53,16 @@ function getExtensions(domtureConfig): string[] {
     return domtureConfig.moduleFileExtensions.map(ext => `.${ext}`)
   const transpiler = getTranspiler(domtureConfig)
   return extMap[transpiler]
+}
+
+function updateAddressIfNeeded(systemjs, load, suffix) {
+  const log = systemjs._nodeRequire('@unional/logging').getLogger('domture')
+  if (suffix) {
+    const address = load.address + suffix
+    log.debug(`locate ${load.address} as ${address}`)
+    load.address = address
+  }
+  else {
+    log.debug(`locate ${load.address}`)
+  }
 }
