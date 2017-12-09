@@ -13,20 +13,19 @@ const extMap = {
 export function locate(load) {
   const isWindows = this._nodeRequire('is-windows')
   if (isWindows())
-    locateForWindows(this, load)
+    return locateForWindows(this, load)
   else
-    locateForOtherOS(this, load)
-
+    return locateForOtherOS(this, load)
 }
 function locateForWindows(systemjs, load) {
   // slice(8): trim 'file:///' + 'C:/Users/...'
   const suffix = findMissingFileSuffix(systemjs, load.address.slice(8))
-  updateAddressIfNeeded(systemjs, load, suffix)
+  return updateAddressIfNeeded(systemjs, load, suffix)
 }
 function locateForOtherOS(systemjs, load) {
   // slice(7): trim 'file://' + '/Users/x/y/z'
   const suffix = findMissingFileSuffix(systemjs, load.address.slice(7))
-  updateAddressIfNeeded(systemjs, load, suffix)
+  return updateAddressIfNeeded(systemjs, load, suffix)
 }
 function findMissingFileSuffix(systemjs, givenFilePath) {
   const fs = systemjs._nodeRequire('fs')
@@ -61,6 +60,7 @@ function updateAddressIfNeeded(systemjs, load, suffix) {
     const address = load.address + suffix
     log.debug(`locate ${load.address} as ${address}`)
     load.address = address
+    return address
   }
   else {
     log.debug(`locate ${load.address}`)
