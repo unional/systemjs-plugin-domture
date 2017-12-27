@@ -10,23 +10,32 @@ const extMap = {
     '.tsx'
   ]
 }
+
 export function locate(load) {
-  const isWindows = this._nodeRequire('is-windows')
-  if (isWindows())
-    return locateForWindows(this, load)
-  else
-    return locateForOtherOS(this, load)
+  const suffix = findMissingFileSuffix(this, getFilePath(load.address))
+
+  const log = this._nodeRequire('@unional/logging').getLogger('domture')
+
+  if (suffix) {
+    const address = load.address + suffix
+    log.debug(`locate ${load.address} as ${address}`)
+    load.address = address
+    return address
+  }
+
+  log.debug(`locate ${load.address}`)
 }
-function locateForWindows(systemjs, load) {
-  // slice(8): trim 'file:///' + 'C:/Users/...'
-  const suffix = findMissingFileSuffix(systemjs, load.address.slice(8))
-  return updateAddressIfNeeded(systemjs, load, suffix)
+
+function getFilePath(address) {
+  const rawPath = address.slice(8)
+
+  // for windows:
+  // file:///C:/Users/...
+  // for others:
+  // file:///Users/...
+  return rawPath[1] === ':' ? rawPath : '/' + rawPath
 }
-function locateForOtherOS(systemjs, load) {
-  // slice(7): trim 'file://' + '/Users/x/y/z'
-  const suffix = findMissingFileSuffix(systemjs, load.address.slice(7))
-  return updateAddressIfNeeded(systemjs, load, suffix)
-}
+
 function findMissingFileSuffix(systemjs, givenFilePath) {
   const fs = systemjs._nodeRequire('fs')
   if (fs.existsSync(givenFilePath)) {
@@ -52,17 +61,4 @@ function getExtensions(domtureConfig): string[] {
     return domtureConfig.moduleFileExtensions.map(ext => `.${ext}`)
   const transpiler = getTranspiler(domtureConfig)
   return extMap[transpiler]
-}
-
-function updateAddressIfNeeded(systemjs, load, suffix) {
-  const log = systemjs._nodeRequire('@unional/logging').getLogger('domture')
-  if (suffix) {
-    const address = load.address + suffix
-    log.debug(`locate ${load.address} as ${address}`)
-    load.address = address
-    return address
-  }
-  else {
-    log.debug(`locate ${load.address}`)
-  }
 }
