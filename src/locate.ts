@@ -12,18 +12,19 @@ const extMap = {
 }
 
 export function locate(load) {
+  const startTime = new Date().getTime()
   const suffix = findMissingFileSuffix(this, getFilePath(load.address))
 
   const log = this._nodeRequire('@unional/logging').getLogger('domture')
 
   if (suffix) {
     const address = load.address + suffix
-    log.debug(`locate ${load.address} as ${address}`)
     load.address = address
+    log.debug(`locate ${load.address} as ${address} (${new Date().getTime() - startTime})`)
     return address
   }
 
-  log.debug(`locate ${load.address}`)
+  log.debug(`locate ${load.address} (${new Date().getTime() - startTime})`)
 }
 
 function getFilePath(address) {
