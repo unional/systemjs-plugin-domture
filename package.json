@@ -41,7 +41,7 @@
     }
   },
   "devDependencies": {
-    "dependency-check": "^2.9.2",
+    "dependency-check": "^3.0.0",
     "eslint-config-unional": "^0.3.0",
     "rimraf": "^2.6.2",
     "semantic-release": "^12.2.2",
