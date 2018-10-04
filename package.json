@@ -44,7 +44,7 @@
     "dependency-check": "^3.0.0",
     "eslint-config-unional": "^0.3.0",
     "rimraf": "^2.6.2",
-    "semantic-release": "^15.0.3",
+    "semantic-release": "^15.9.17",
     "tslint": "^5.8.0",
     "tslint-config-unional": "^0.9.3",
     "typescript": "^2.6.2"
