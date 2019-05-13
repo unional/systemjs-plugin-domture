@@ -50,7 +50,7 @@
     "typescript": "^2.6.2"
   },
   "dependencies": {
-    "@unional/logging": "^1.0.1",
+    "@unional/logging": "^1.0.5",
     "is-windows": "^1.0.1"
   }
 }
