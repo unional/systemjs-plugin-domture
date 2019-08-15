@@ -43,7 +43,7 @@
   "devDependencies": {
     "dependency-check": "^3.0.0",
     "eslint-config-unional": "^0.3.0",
-    "rimraf": "^2.6.2",
+    "rimraf": "^3.0.0",
     "semantic-release": "^15.0.3",
     "tslint": "^5.8.0",
     "tslint-config-unional": "^0.10.0",
